@@ -1,0 +1,4 @@
+@font-face {
+    font-family: "splatoon2";
+    src: local("Splatoon2"), url("./Splatoon2.otf") format("otf");
+}
