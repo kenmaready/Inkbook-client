@@ -26,9 +26,9 @@ export class Splatune extends Component {
         return (
             <div className="audioControl">
                 {!this.state.playing ? (
-                    <PlayCircleIcon onClick={this.playAudio} size="large" />
+                    <PlayCircleIcon onClick={this.playAudio} size="sm" />
                 ) : (
-                    <PauseCircleIcon onClick={this.playAudio} size="large" />
+                    <PauseCircleIcon onClick={this.playAudio} size="sm" />
                 )}
                 <audio className="music">
                     <source src="./music/now_or_never.mp3"></source>

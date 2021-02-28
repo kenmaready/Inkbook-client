@@ -19,3 +19,11 @@ export const deletePost = (currentId) => {
 export const likePost = (currentId) => {
     return axios.post(`posts/like/${currentId}`);
 };
+
+export const signin = (formData) => {
+    return axios.post("user/signin", formData);
+};
+
+export const signup = (formData) => {
+    return axios.post("user/signup", formData);
+};

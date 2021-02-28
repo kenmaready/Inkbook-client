@@ -10,16 +10,50 @@ import {
     CircularProgress,
 } from "@material-ui/core";
 import ThumbUpAltIcon from "@material-ui/icons/ThumbUpAlt";
+import ThumbUpAltOutlinedIcon from "@material-ui/icons/ThumbUpAltOutlined";
 import DeleteIcon from "@material-ui/icons/Delete";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 import moment from "moment";
 import { deletePost, likePost } from "../../../actions/posts";
 import useStyles from "./styles";
 import defaultImg from "../../../images/blue-squid.png";
+import { ThumbUpAltOutlined } from "@material-ui/icons";
 
 export default function Post({ post, setCurrentId }) {
+    const user = JSON.parse(localStorage.getItem("profile"));
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    const Likes = () => {
+        if (post.likes.length > 0) {
+            return post.likes.find(
+                (like) => like === (user?.result?.googleId || user?.result?._id)
+            ) ? (
+                <>
+                    <ThumbUpAltIcon fontSize="small" />
+                    &nbsp;
+                    {post.likes.length > 2
+                        ? `You and ${post.likes.length - 1} others`
+                        : `${post.likes.length} like${
+                              post.likes.length > 1 ? "s" : ""
+                          }`}
+                </>
+            ) : (
+                <>
+                    <ThumbUpAltOutlined fontSize="small" />
+                    &nbsp;{post.likes.length}{" "}
+                    {post.likes.length === 1 ? "Like" : "Likes"}
+                </>
+            );
+        }
+
+        return (
+            <>
+                <ThumbUpAltOutlined fontSize="small" />
+                &nbsp;Like
+            </>
+        );
+    };
 
     const handleClick = () => {
         setCurrentId(post._id);
@@ -43,20 +77,23 @@ export default function Post({ post, setCurrentId }) {
                     {post.title}
                 </Typography>
                 <br />
-                <Typography variant="body2">{post.creator}</Typography>
+                <Typography variant="body2">{post.name}</Typography>
                 <Typography variant="body2">
                     {moment(post.createdAt).fromNow()}
                 </Typography>
             </div>
-            <div className={classes.overlay2}>
-                <Button
-                    style={{ color: "white" }}
-                    size="small"
-                    onClick={handleClick}
-                >
-                    <MoreHorizIcon fontSize="small" />
-                </Button>
-            </div>
+            {(user?.result?.googleId === post?.creator ||
+                user?.result?._id === post?.creator) && (
+                <div className={classes.overlay2}>
+                    <Button
+                        style={{ color: "white" }}
+                        size="small"
+                        onClick={handleClick}
+                    >
+                        <MoreHorizIcon fontSize="small" />
+                    </Button>
+                </div>
+            )}
 
             <CardContent>
                 <Typography
@@ -77,19 +114,21 @@ export default function Post({ post, setCurrentId }) {
                     size="small"
                     className={classes.icons}
                     onClick={handleLike}
+                    disabled={!user?.result}
                 >
-                    <ThumbUpAltIcon fontSize="small" />
-                    Like &nbsp;
-                    {post.likeCount}
+                    <Likes />
                 </Button>
-                <Button
-                    size="small"
-                    className={classes.icons}
-                    onClick={handleDelete}
-                >
-                    <DeleteIcon fontSize="small" />
-                    Delete
-                </Button>
+                {(user?.result?.googleId === post?.creator ||
+                    user?.result?._id === post?.creator) && (
+                    <Button
+                        size="small"
+                        className={classes.icons}
+                        onClick={handleDelete}
+                    >
+                        <DeleteIcon fontSize="small" />
+                        Delete
+                    </Button>
+                )}
             </CardActions>
         </Card>
     );

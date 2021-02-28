@@ -6,7 +6,6 @@ import { createPost, updatePost } from "../../actions/posts";
 import useStyles from "./styles";
 
 const defaultPostData = {
-    creator: "",
     title: "",
     message: "",
     tags: [],
@@ -20,6 +19,7 @@ function useForceUpdate() {
 
 export default function Form({ currentId, setCurrentId }) {
     const [postData, setPostData] = useState(defaultPostData);
+    const user = JSON.parse(localStorage.getItem("profile"));
     const classes = useStyles();
     const dispatch = useDispatch();
     const forceUpdate = useForceUpdate();
@@ -34,7 +34,6 @@ export default function Form({ currentId, setCurrentId }) {
     const clear = () => {
         setPostData(defaultPostData);
         setCurrentId(null);
-        forceUpdate();
         // TODO: Figure out how to clear filename from FileBase Component
     };
     const handleChange = (e) => {
@@ -52,12 +51,27 @@ export default function Form({ currentId, setCurrentId }) {
     };
     const handleSubmit = (e) => {
         e.preventDefault();
+        const enhancedPostData = {
+            ...postData,
+            name: user?.result?.username,
+        };
         if (currentId) {
-            dispatch(updatePost(currentId, postData, clear));
+            dispatch(updatePost(currentId, enhancedPostData, clear));
         } else {
-            dispatch(createPost(postData, clear));
+            dispatch(createPost(enhancedPostData, clear));
+        }
+
+        if (!user?.result?.username) {
+            return (
+                <Paper className={classes.paper}>
+                    <Typography variant="h6" align="center">
+                        Please sign in to post and like splats
+                    </Typography>
+                </Paper>
+            );
         }
     };
+
     return (
         <Paper className={classes.paper}>
             <form
@@ -69,15 +83,6 @@ export default function Form({ currentId, setCurrentId }) {
                 <Typography variant="h5" className={classes.headline}>
                     {currentId ? "Edit your splat!" : "Create a splat!"}
                 </Typography>
-                <TextField
-                    name="creator"
-                    variant="outlined"
-                    label="creator"
-                    className={classes.formInput}
-                    fullWidth
-                    value={postData.creator}
-                    onChange={handleChange}
-                />
                 <TextField
                     name="title"
                     variant="outlined"
@@ -106,6 +111,7 @@ export default function Form({ currentId, setCurrentId }) {
                     onChange={handleChange}
                 />
                 <div className={classes.fileInput}>
+                    Add an image:
                     <FileBase
                         type="file"
                         multiple={false}
